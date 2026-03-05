@@ -1,6 +1,3 @@
-ontend · PY
-Copy
-
 import streamlit as st
 from chatbot_logic import get_response, get_characters
 
