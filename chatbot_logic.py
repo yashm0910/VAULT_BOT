@@ -109,17 +109,15 @@ def chat_node(state: ChatState):
     character = state["character"]
     user_alias = state["user_alias"]
     
+    # NEW — paste this instead
+    api_key = None
     try:
         import streamlit as st
-        api_key = st.secrets["GROQ_API_KEY"]
+        api_key = st.secrets.get("GROQ_API_KEY")
     except Exception:
+        pass
+    if not api_key:
         api_key = os.environ.get("GROQ_API_KEY")
-    llm = ChatGroq(
-        model="llama-3.3-70b-versatile",
-        groq_api_key=api_key,
-        max_tokens=600,
-        temperature=0.85,
-    )
     
     system_prompt = get_system_prompt(character, user_alias)
     messages_to_send = [SystemMessage(content=system_prompt)] + state["messages"]
