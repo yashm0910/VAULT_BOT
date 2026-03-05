@@ -5,9 +5,6 @@ from langgraph.graph.message import add_messages
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_groq import ChatGroq
 from typing_extensions import TypedDict
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 # ── Character Definitions ──────────────────────────────────────────────────────
@@ -112,7 +109,11 @@ def chat_node(state: ChatState):
     character = state["character"]
     user_alias = state["user_alias"]
     
-    api_key = os.getenv("GROQ_API_KEY")
+    try:
+        import streamlit as st
+        api_key = st.secrets["GROQ_API_KEY"]
+    except Exception:
+        api_key = os.environ.get("GROQ_API_KEY")
     llm = ChatGroq(
         model="llama-3.3-70b-versatile",
         groq_api_key=api_key,
