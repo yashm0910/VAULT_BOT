@@ -559,50 +559,32 @@ elif st.session_state.stage == "chat":
     st.markdown('</div>', unsafe_allow_html=True)
 
     # Input
-    st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-
-    with st.container():
-        input_col, btn_col = st.columns([5, 1])
-        with input_col:
-            user_input = st.text_input(
-                "",
-                placeholder="Say anything... (type 'exit' to close the vault)",
-                key="chat_input",
-                label_visibility="collapsed",
-            )
-        with btn_col:
-            send = st.button("Send", key="send_btn")
-
     st.markdown("""
-    <p class="exit-hint">type <strong>exit</strong> anytime to close the vault — everything disappears 🔒</p>
-    """, unsafe_allow_html=True)
+<p class="exit-hint">type <strong>exit</strong> anytime to close the vault — everything disappears 🔒</p>
+""", unsafe_allow_html=True)
 
-    # Handle send
-    if send and user_input.strip():
-        text = user_input.strip()
+user_input = st.chat_input("Say anything...")
 
-        # EXIT command
-        if text.lower() in ["exit", "bye", "quit", "goodbye", "close"]:
-            st.session_state.stage = "goodbye"
-            st.rerun()
+if user_input and user_input.strip():
+    text = user_input.strip()
 
-        # Normal message
-        st.session_state.messages.append({"role": "user", "content": text})
-
-        # Build history for API (exclude the opening AI message from "history" passed in,
-        # since it's injected by persona - keep last N turns only for efficiency)
-        history = [m for m in st.session_state.messages[:-1]]
-
-        with st.spinner(f"{st.session_state.character} is typing..."):
-            reply = get_response(
-                message=text,
-                history=history,
-                character=st.session_state.character,
-                user_alias=st.session_state.user_alias,
-            )
-
-        st.session_state.messages.append({"role": "assistant", "content": reply})
+    if text.lower() in ["exit", "bye", "quit", "goodbye", "close"]:
+        st.session_state.stage = "goodbye"
         st.rerun()
+
+    st.session_state.messages.append({"role": "user", "content": text})
+    history = [m for m in st.session_state.messages[:-1]]
+
+    with st.spinner(f"{st.session_state.character} is typing..."):
+        reply = get_response(
+            message=text,
+            history=history,
+            character=st.session_state.character,
+            user_alias=st.session_state.user_alias,
+        )
+
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.rerun()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
